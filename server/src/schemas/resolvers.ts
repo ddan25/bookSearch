@@ -1,6 +1,5 @@
-import { saveBook } from '../controllers/user-controller.js';
-import { user } from '../models/index.js';
-import { signToken, AuthenticationError } from '../utils/auth.js';
+import User from '../models/index.js';
+import { signToken, AuthenticationError } from '../services/auth.js';
 
 // Define types for the arguments
 interface AddUserArgs {
@@ -65,13 +64,36 @@ const resolver = {
         saveBook: async (_parent: any,  input : bookInput, context: any) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
-                    { _id: contet.user._id },
+                    { _id: content.user._id },
                     { $addToSet: { savedBooks: input } },
                     { new: true, runValidators: true }
                 );
                 return updatedUser;
             }
-        }
+        },
+
+        removeBook: async (_parent: any, { bookId }: bookInput, context: any) => {
+            if (context.user) {
+              const thought = await Book.findOneAndDelete({
+                _id: bookId,
+                thoughtAuthor: context.user.book,
+              });
+      
+              if(!thought){
+                throw AuthenticationError;
+              }
+      
+              await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $pull: { books: book._id } }
+              );
+      
+              return book;
+            }
+            throw AuthenticationError;
+          },
 
     }
 }
+
+export default resolver;
