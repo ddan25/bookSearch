@@ -1,5 +1,7 @@
-import User from '../models/index.js';
+import DB from '../models/index.js';
+const { User } = DB
 import { signToken, AuthenticationError } from '../services/auth.js';
+
 
 // Define types for the arguments
 interface AddUserArgs {
@@ -10,15 +12,15 @@ interface AddUserArgs {
     }
 }
 
-interface bookInput {
-    authors?: string[] | null;
-    description?: string | null;
-    bookId: string | null;
-    title: string | null;
-    image: string | null;
-    link: string | null;
+// interface bookInput {
+//     authors?: string[] | null;
+//     description?: string | null;
+//     bookId: string | null;
+//     title: string | null;
+//     image: string | null;
+//     link: string | null;
 
-}
+// }
 
 interface LoginUserArgs {
     email: string;
@@ -61,37 +63,37 @@ const resolver = {
 
             return { token, user };
         },
-        saveBook: async (_parent: any,  input : bookInput, context: any) => {
-            if (context.user) {
-                const updatedUser = await User.findOneAndUpdate(
-                    { _id: content.user._id },
-                    { $addToSet: { savedBooks: input } },
-                    { new: true, runValidators: true }
-                );
-                return updatedUser;
-            }
-        },
+        // saveBook: async (_parent: any,  input : bookInput, context: any) => {
+        //     if (context.user) {
+        //         const updatedUser = await User.findOneAndUpdate(
+        //             { _id: context.user._id },
+        //             { $addToSet: { savedBooks: input } },
+        //             { new: true, runValidators: true }
+        //         );
+        //         return updatedUser;
+        //     }
+        // },
 
-        removeBook: async (_parent: any, { bookId }: bookInput, context: any) => {
-            if (context.user) {
-              const thought = await Book.findOneAndDelete({
-                _id: bookId,
-                thoughtAuthor: context.user.book,
-              });
+        // removeBook: async (_parent: any, { bookId }: bookInput, context: any) => {
+        //     if (context.user) {
+        //       const thought = await Book.findOneAndDelete({
+        //         _id: bookId,
+        //         thoughtAuthor: context.user.book,
+        //       });
       
-              if(!thought){
-                throw AuthenticationError;
-              }
+        //       if(!thought){
+        //         throw AuthenticationError;
+        //       }
       
-              await User.findOneAndUpdate(
-                { _id: context.user._id },
-                { $pull: { books: book._id } }
-              );
+        //       await User.findOneAndUpdate(
+        //         { _id: context.user._id },
+        //         { $pull: { books: book._id } }
+        //       );
       
-              return book;
-            }
-            throw AuthenticationError;
-          },
+        //       return book;
+        //     }
+        //     throw AuthenticationError;
+        //   },
 
     }
 }
