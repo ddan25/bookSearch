@@ -19,3 +19,31 @@ mutation addUser($input: UserInput!) {
   }
 }
 `;
+export const SAVE_BOOK = gql`
+mutation Mutation($input: BookInput!) {
+  saveBook(input: $input) {
+    _id
+    username
+    email
+    password
+    savedBooks {
+      title
+      _id
+    }
+  }
+}
+  `;
+
+  export const REMOVE_BOOK = gql`
+  mutation RemoveBook($bookId: ID!) {
+    removeBook(bookId: $bookId) {
+      _id
+      savedBooks {
+        authors
+        bookId
+      }
+      email
+      username
+    }
+  }
+    `;

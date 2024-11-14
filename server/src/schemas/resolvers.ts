@@ -12,15 +12,15 @@ interface AddUserArgs {
     }
 }
 
-// interface bookInput {
-//     authors?: string[] | null;
-//     description?: string | null;
-//     bookId: string | null;
-//     title: string | null;
-//     image: string | null;
-//     link: string | null;
+interface bookInput {
+    authors?: string[] | null;
+    description?: string | null;
+    bookId: string | null;
+    title: string | null;
+    image: string | null;
+    link: string | null;
 
-// }
+}
 
 interface LoginUserArgs {
     email: string;
@@ -63,37 +63,32 @@ const resolver = {
 
             return { token, user };
         },
-        // saveBook: async (_parent: any,  input : bookInput, context: any) => {
-        //     if (context.user) {
-        //         const updatedUser = await User.findOneAndUpdate(
-        //             { _id: context.user._id },
-        //             { $addToSet: { savedBooks: input } },
-        //             { new: true, runValidators: true }
-        //         );
-        //         return updatedUser;
-        //     }
-        // },
+        saveBook: async (_parent: any, { input }: { input: bookInput }, context: any) => {
+            if (context.user) {
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $addToSet: { savedBooks: input } },
+                    { new: true, runValidators: true }
+                );
+                return updatedUser;
+            }
+            throw new AuthenticationError('Could not authenticate user.');
+        },
 
-        // removeBook: async (_parent: any, { bookId }: bookInput, context: any) => {
-        //     if (context.user) {
-        //       const thought = await Book.findOneAndDelete({
-        //         _id: bookId,
-        //         thoughtAuthor: context.user.book,
-        //       });
+        removeBook: async (_parent: any, { bookId }: {bookId: string}, context: any) => {
+            if (context.user) {
+            
       
-        //       if(!thought){
-        //         throw AuthenticationError;
-        //       }
+              let user = await User.findOneAndUpdate(
+                { _id: context.user._id },
+                { $pull: { savedBooks: {bookId} } },
+                { new: true }
+              );
       
-        //       await User.findOneAndUpdate(
-        //         { _id: context.user._id },
-        //         { $pull: { books: book._id } }
-        //       );
-      
-        //       return book;
-        //     }
-        //     throw AuthenticationError;
-        //   },
+              return user;
+            }
+            throw AuthenticationError;
+          },
 
     }
 }
